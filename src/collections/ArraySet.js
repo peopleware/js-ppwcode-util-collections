@@ -58,6 +58,10 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           return element.isInstanceOf(this._elementType); // TODO not general enough; requires dojo
         },
 
+        getEquivalence: function() {
+          return this._equivalence;
+        },
+
         getSize: function() {
           return this._data.length;
         },

@@ -1,3 +1,3 @@
 define([
-  "collections/test/XXXX"
+  "collections/test/ArraySet"
 ], 1);
