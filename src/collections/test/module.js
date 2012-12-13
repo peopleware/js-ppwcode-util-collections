@@ -1,3 +1,3 @@
 define([
-  "contracts/test/declare"
+  "collections/test/XXXX"
 ], 1);
