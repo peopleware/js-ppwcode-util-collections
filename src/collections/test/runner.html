@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>be/ppwcode/util/contracts/I Test Runner</title>
+  <meta charset="UTF-8" />
+  <!--
+		test =
+			// zero to many AMD modules and/or URLs to load; provided by csv URL query parameter="test"
+			// For example, the URL...
+			//
+			//		 path-to-util/doh/runner.html?test=doh/selfTest,my/path/test.js
+			//
+			// ...will load...
+			//
+			//	 * the AMD module doh/selfTest
+			//	 * the plain old Javascript resource my/path/test.js
+			//
+			["dojo/tests/module"],
+
+		paths =
+			// zero to many path items to pass to the AMD loader; provided by semicolon separated values
+			// for URL query parameter="paths"; each path item has the form <from-path>,<to-path>
+			// i.e. path-to-util/doh/runner.html?paths=my/from/path,my/to/path;my/from/path2,my/to/path2
+			{},
+
+		dohPlugins =
+			// Semicolon separated list of files to load before the tests.
+			// Idea is to override aspects of DOH for reporting purposes.
+			"",
+
+		breakOnError =
+			// boolean; instructs doh to call the debugger upon a test failures; this can be helpful when
+			// trying to isolate exactly where the test failed
+			false,
+
+		async =
+			// boolean; config require.asyc==true before loading boot; this will have the effect of making
+			// version 1.7+ dojo bootstrap/loader operating in async mode
+			false,
+
+		sandbox =
+			// boolean; use a loader configuration that sandboxes the dojo and dojox objects used by doh
+			false,
+  -->
+  <meta http-equiv="refresh"
+        content="0;url=../../util/doh/runner.html?breakOnError=false&async=true&testModule=contracts/test/module" />
+</head>
+<body>
+Redirecting to D.O.H runner.
+</body>
+</html>
