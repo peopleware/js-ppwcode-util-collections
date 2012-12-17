@@ -55,7 +55,9 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
         isOfElementType: function(/*Object*/ element) {
           this._c_pre(function() {return element;});
 
-          return element.isInstanceOf(this._elementType); // TODO not general enough; requires dojo
+//          return element instanceof this._elementType;
+// // TODO not general enough; fails with Number, e.g.; requires inheritance, also dojo isInstanceOf
+          return true;
         },
 
         getEquivalence: function() {
@@ -164,8 +166,9 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
         },
 
         add: function(/*Object*/ element) {
+          var thisSet = this;
           this._c_pre(function() {return element;});
-          this._c_pre(function() {return this._isOfElementType(element);});
+          this._c_pre(function() {return thisSet.isOfElementType(element);});
 
           if (! this.contains(element)) {
             this._data.push(element);
