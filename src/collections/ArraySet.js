@@ -198,7 +198,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           },
           this);
           if (elementIndex > -1) {
-            this._data = this._data.splice(elementIndex, 1);
+            this._data.splice(elementIndex, 1);
           }
         },
 
