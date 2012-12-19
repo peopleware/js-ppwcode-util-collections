@@ -15,5 +15,5 @@
  */
 
 define([
-  "collections/test/ArraySet"
+  "./ArraySet"
 ], 1);
