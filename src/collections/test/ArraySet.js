@@ -17,7 +17,7 @@
 define(["dojo/main", "ppwcode/contracts/doh", "../ArraySet"],
   function(dojo, doh, ArraySet) {
 
-    doh.register("ArraySet", [
+    doh.register("ppwcode util collections ArraySet", [
 
       function testConstructor1a() {
         var subject = new ArraySet();
