@@ -41,7 +41,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
         return one === other;
       }
 
-      var ArraySet = declare("be.ppwcode.util.collections.ArraySet", [_ContractMixin], {
+      var ArraySet = declare([_ContractMixin], {
         // summary:
         //   An ArraySet is a Set, which is internally represented as an Array.
 
@@ -265,6 +265,10 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
 
         toString: function() {
           return this._data.toString();
+        },
+
+        toJson: function() {
+          return this._data;
         }
 
       });
