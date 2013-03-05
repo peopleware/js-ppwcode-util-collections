@@ -11,8 +11,8 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
 
     var OurStore = declare([_ContractsMixin, Base], {
       // summary:
-      //		An in-memory object store like dojo/store/Memory, but with the following
-      //    differences:
+      //		An in-memory Observable object store like dojo/store/Memory wrapped in dojo/store/Observable,
+      //    but with the following differences:
       //    1) We don't change the objects that are kept in the store. If you are not very
       //       carefull, dojo/store/Memory inserts an "id" property for its own benefit,
       //       whose behavior depends on chance (random).
