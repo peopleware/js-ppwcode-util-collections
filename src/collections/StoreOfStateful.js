@@ -3,33 +3,36 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         "dojo/store/Observable" /*=====, "./api/Store" =====*/],
   function(declare, _ContractsMixin,
            QueryResults, SimpleQueryEngine,
-           Observable /*=====, Store =====*/) {
+           Observable) {
 
-    // No base class, but for purposes of documentation, the base class is dojo/store/api/Store
-    var Base = null;
-    /*===== Base = Store; =====*/
+    var ERROR_ALREADY_IN_STORE = new Error("Object already exists in this store");
 
-    var OurStore = declare([_ContractsMixin, Base], {
+    var OurStore = declare([_ContractsMixin], {
       // summary:
       //		An in-memory Observable object store like dojo/store/Memory wrapped in dojo/store/Observable,
       //    but with the following differences:
       //    1) We don't change the objects that are kept in the store. If you are not very
-      //       carefull, dojo/store/Memory inserts an "id" property for its own benefit,
+      //       careful, dojo/store/Memory inserts an "id" property for its own benefit,
       //       whose behavior depends on chance (random).
       //    2) We are aware of Stateful.
       //       If an element changes, we also send changed events. You do not have
       //       to re-put.
       //    3) removeAll, loadAll
+      //    4) You need to inject a getIdentity function. It must work on all objects
+      //       that ever were in the store or will be in the store, independent of the store.
       // description:
       //    On development we immediately need constructor, put, removeAll, loadAll, and query.
-      //    get, getIdentity, and remove are optional.
-      //    Query needs an array to be returned. It therefor is wasteful to keep an index, which
+      //    getIdentity is needed for Observable.
+      //    get and remove are optional.
+      //    Query needs an array to be supplied. It therefor is wasteful to keep an index, which
       //    only helps with get and remove.
-      //    idProperty is wasteful and stupid, but used in many uses of Store.
-      //    Therefor, we will wrap the real objects in a helper object. The helper object
-      //    has the id-attribute. It's value is calculated and kept in sync by a
-      //    idPropertyDerivation function.
-      //    If idProperty changes, all bets are off.
+      //    idProperty is wasteful and stupid. We kill it.
+      //    We wrap the real objects in a helper object, to keep track of the watchers of
+      //    Stateful objects.
+      //    If getIdentity changes, all bets are off.
+      //
+      //    Before you throw away the store, you must call removeAll, so that
+      //    we can clean up listeners. Otherwise, you will have a memory leak.
       //
       //    Based on dojo/store/Memory
 
@@ -44,14 +47,10 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       //   The internal representation of the data
       _data: null,
 
-      // idProperty: String
-      //		Indicates the property to use as the identity property. Don't change this.
-      idProperty: "id",
-
       // idPropertyDerivation: Function
       //    Stateful --> String
       //    Derives a unique id from a Stateful object as argument.
-      idPropertyDerivation: null,
+      getIdentity: null,
 
       // queryEngine: Function
       //		Defines the query engine to use for querying the data store
@@ -65,10 +64,10 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
             // on change, see if the id has changed
             // if it has, signal removal, and a new addition
             // if is has not, signal change
-            var oldId = wrapper[thisStore.idProperty];
-            var newId = thisStore.idPropertyDerivation();
+            var oldId = wrapper.id;
+            var newId = thisStore.getIdentity(wrapper.data);
             if (oldId != newId) {
-              wrapper[thisStore.idProperty] = newId;
+              wrapper.id = newId;
               thisStore.notify(null, oldId);
               thisStore.notify(wrapper.data, null);
             }
@@ -79,14 +78,13 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
           wrapper.watcher = wrapper.data.watch(watcher);
         }
 
-        var id = thisStore.idPropertyDerivation(s);
-        var result = {};
-        result[thisStore.idProperty] = id;
-        result.data = s;
+        var result = {
+          id: thisStore.getIdentity(s),
+          data: s
+        };
         addWatcher(result);
         return result;
       },
-
 
       constructor: function(options){
         // summary:
@@ -96,7 +94,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         //		This should generally include the data property to provide the starting set of data.
 
         this._c_pre(function() {return options;});
-        this._c_pre(function() {return this._c_prop_mandatory(options, "idPropertyDerivation");});
+        this._c_pre(function() {return this._c_prop_mandatory(options, "getIdentity");});
 
         var thisStore = this;
         Object.keys(options).
@@ -116,37 +114,15 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         }
       },
 
-      get: function(id){
+      contains: function(object){
         // summary:
-        //		Retrieves an object by its identity
-        // id: Number
-        //		The identity to use to lookup the object
-        // returns: Object
-        //		The object in the store that matches the given id.
-
-        var filterResult = this._data.filter(function(wrapper) {
-          return wrapper[this.idProperty] === id;
-        });
-        if (filterResult.length > 1) {
-          throw "ERROR: duplicate id in store (id: " + id + ", store: " + this + ")";
-        }
-        else if (filterResult.length === 0) {
-          return null;
-        }
-        else {
-          return filterResult[0].data;
-        }
-      },
-
-      getIdentity: function(object){
-        // summary:
-        //		Returns an object's identity
+        //		Is the object in this store?
         // object: Object
-        //		The object to get the identity from
-        // returns: Number
+        //		The object to check membership for. We compare
+        // returns: Boolean
 
         var filterResult = this._data.filter(function(wrapper) {
-          return wrapper[data] === object;
+          return wrapper.data === object;
         });
         if (filterResult.length > 1) {
           throw "ERROR: object in store more then once (object: " + object + ", store: " + this + ")";
@@ -159,6 +135,28 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         }
       },
 
+      get: function(id){
+        // summary:
+        //		Retrieves an object by its identity
+        // id: Number
+        //		The identity to use to lookup the object
+        // returns: Object
+        //		The object in the store that matches the given id.
+
+        var filterResult = this._data.filter(function(wrapper) {
+          return wrapper.id === id;
+        });
+        if (filterResult.length > 1) {
+          throw "ERROR: duplicate id in store (id: " + id + ", store: " + this + ")";
+        }
+        else if (filterResult.length === 0) {
+          return null;
+        }
+        else {
+          return filterResult[0].data;
+        }
+      },
+
       put: function(object) {
         // summary:
         //		Stores an object. Options are ignored.
@@ -166,8 +164,14 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         //		The object to store.
         // returns: Number
 
-        var wrapper = this._wrap(object);
-        this._data.push(wrapper); // Store spec doesn't say what we should return. We return nothing.
+        try {
+          this.add(object);
+        }
+        catch (e) {
+          if (e !== ERROR_ALREADY_IN_STORE) {
+            throw e;
+          }
+        }
       },
 
       add: function(object){
@@ -178,10 +182,11 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         //		The object to store.
         // returns: Number
 
-        if (this.getIdentity(object)) {
-          throw new Error("Object already exists");
+        if (this.get(this.getIdentity(object))) { // we have this object already
+          throw ERROR_ALREADY_IN_STORE;
         }
-        this.put(object); // Store spec doesn't say what we should return. We return nothing.
+        var wrapper = this._wrap(object);
+        this._data.push(wrapper); // Store spec doesn't say what we should return. We return nothing.
       },
 
       remove: function(id){
@@ -194,13 +199,13 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
 
         var thisStore = this;
         var foundAtIndex = this._data.reduce(
-          function(acc, element, index) {
-            if (element[thisStore.idProperty] === id) {
+          function(acc, wrapper, index) {
+            if (wrapper.id === id) {
               if (acc > -1) {
                 throw "ERROR: duplicate id in store (id: " + id + ", store: " + thisStore + ")";
               }
               else {
-                element.watcher.unwatch();
+                wrapper.watcher.unwatch();
                 return index;
               }
             }
@@ -262,7 +267,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
             if (indexInData < 0) {
               // not in inData; don't add to acc, signal removal
               wrapper.watcher.unwatch();
-              thisStore.notify(null, wrapper[thisStore.idProperty]);
+              thisStore.notify(null, wrapper.id);
             }
             else {
               // keep the element (add to acc), and note handled.
@@ -274,8 +279,8 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
           []
         );
         // what is left in inData needs to be added
-        inData.forEach(function(element) {
-          thisStore.put(element);
+        inData.forEach(function(newElement) {
+          thisStore.put(newElement);
         });
       },
 
@@ -286,13 +291,15 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         thisStore._data = [];
         oldData.forEach(function(wrapper) {
           wrapper.watcher.unwatch();
-          thisStore.notify(null, wrapper[thisStore.idProperty]);
+          thisStore.notify(null, wrapper.id);
         });
       }
 
     });
 
-    var OurObservableStore = Observable(OurStore);
+    var OurObservableStore = function(options) {
+      return Observable(new OurStore(options));
+    };
 
     return OurObservableStore;
 
