@@ -251,7 +251,9 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         //	...or find all items where "even" is true:
         //
         //	|	var results = store.query({ even: true });
-        return QueryResults(this.queryEngine(query, options)(this.data));
+        return QueryResults(this.queryEngine(query, options)(this._data.map(function(wrapper) {
+          return wrapper.data;
+        })));
       },
 
       loadAll: function(data) {
@@ -293,6 +295,10 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
           wrapper.watcher.unwatch();
           thisStore.notify(null, wrapper.id);
         });
+      },
+
+      getLength: function() {
+        return this._data.length;
       }
 
     });
