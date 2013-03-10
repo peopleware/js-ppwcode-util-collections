@@ -1,9 +1,9 @@
 define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         "dojo/store/util/QueryResults", "dojo/store/util/SimpleQueryEngine",
-        "dojo/store/Observable" /*=====, "./api/Store" =====*/],
+        "dojo/store/Observable", "dojo/_base/lang" /*=====, "./api/Store" =====*/],
   function(declare, _ContractsMixin,
            QueryResults, SimpleQueryEngine,
-           Observable) {
+           Observable, lang) {
 
     var ERROR_ALREADY_IN_STORE = new Error("Object already exists in this store");
 
@@ -37,10 +37,6 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       //    Based on dojo/store/Memory
 
       _c_invar: [
-        function() {return this._c_prop_mandatory("idProperty");},
-        function() {return this._c_prop_string("idProperty");},
-        function() {return this._c_prop_mandatory("idPropertyDerivation");},
-        function() {return this._c_prop_function("idPropertyDerivation");}
       ],
 
       // _data: Array
@@ -57,6 +53,8 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       queryEngine: SimpleQueryEngine,
 
       _wrap: function(/*Stateful*/ s) {
+        this._c_pre(function() {return this.isOperational();});
+
         var thisStore = this;
 
         function addWatcher(wrapper) {
@@ -86,40 +84,45 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         return result;
       },
 
-      constructor: function(options){
+      constructor: function(options) {
         // summary:
         //		Creates a store of stateful objects.
         // options: dojo/store/Memory
         //		This provides any configuration information that will be mixed into the store.
         //		This should generally include the data property to provide the starting set of data.
 
-        this._c_pre(function() {return options;});
-        this._c_pre(function() {return this._c_prop_mandatory(options, "getIdentity");});
-
         var thisStore = this;
-        Object.keys(options).
-          filter(function(key) {return key !== "data";}).
-          forEach(function(key) {thisStore[key] = options[key];});
-        if (options && options.data) {
-          thisStore._data = options.data.reduce(
-            function(acc, element) {
-              acc.push(thisStore._wrap(element));
-              return acc;
-            },
-            []
-          );
+        if (options) {
+          Object.keys(options).
+            filter(function(key) {return key !== "data";}).
+            forEach(function(key) {thisStore[key] = options[key];});
+          if (options.data) {
+            thisStore._data = options.data.reduce(
+              function(acc, element) {
+                acc.push(thisStore._wrap(element));
+                return acc;
+              },
+              []
+            );
+          }
         }
         else {
           thisStore._data = [];
         }
       },
 
+      isOperational: function() {
+        return this.getIdentity && lang.isFunction(this.getIdentity) &&
+          this.queryEngine && lang.isFunction(this.queryEngine);
+      },
+
       contains: function(object){
         // summary:
         //		Is the object in this store?
         // object: Object
-        //		The object to check membership for. We compare
+        //		The object to check membership for. We compare ===.
         // returns: Boolean
+        this._c_pre(function() {return this.isOperational();});
 
         var filterResult = this._data.filter(function(wrapper) {
           return wrapper.data === object;
@@ -127,11 +130,8 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         if (filterResult.length > 1) {
           throw "ERROR: object in store more then once (object: " + object + ", store: " + this + ")";
         }
-        else if (filterResult.length === 0) {
-          return null;
-        }
         else {
-          return filterResult[0][this.idProperty];
+          return filterResult.length === 1;
         }
       },
 
@@ -163,6 +163,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         // object: Object
         //		The object to store.
         // returns: Number
+        this._c_pre(function() {return this.isOperational();});
 
         try {
           this.add(object);
@@ -181,6 +182,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         // object: Object
         //		The object to store.
         // returns: Number
+        this._c_pre(function() {return this.isOperational();});
 
         if (this.get(this.getIdentity(object))) { // we have this object already
           throw ERROR_ALREADY_IN_STORE;
@@ -251,6 +253,8 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         //	...or find all items where "even" is true:
         //
         //	|	var results = store.query({ even: true });
+        this._c_pre(function() {return this.isOperational();});
+
         return QueryResults(this.queryEngine(query, options)(this._data.map(function(wrapper) {
           return wrapper.data;
         })));
@@ -260,6 +264,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         // summary:
         //   replaces current data with new data; common objects
         //   are not signalled as removed and added again
+        this._c_pre(function() {return this.isOperational();});
 
         var thisStore = this;
         var inData = data.slice(0);

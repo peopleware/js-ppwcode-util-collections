@@ -15,5 +15,6 @@
  */
 
 define([
-  "./ArraySet"
+  "./ArraySet",
+  "./StoreOfStateful"
 ], 1);
