@@ -44,7 +44,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
 
       // _data: Array
       //   The internal representation of the data
-      _data: [],
+      _data: null,
 
       // idPropertyDerivation: Function
       //    Stateful --> String
@@ -111,6 +111,9 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
               },
               []
             );
+          }
+          else {
+            hisStore._data = [];
           }
         }
         else {
