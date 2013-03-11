@@ -44,7 +44,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
 
       // _data: Array
       //   The internal representation of the data
-      _data: null,
+      _data: [],
 
       // idPropertyDerivation: Function
       //    Stateful --> String
