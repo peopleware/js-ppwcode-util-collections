@@ -1,13 +1,13 @@
 define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         "dojo/store/util/QueryResults", "dojo/store/util/SimpleQueryEngine",
-        "dojo/store/Observable", "dojo/_base/lang" /*=====, "./api/Store" =====*/],
+        "dojo/_base/lang" /*=====, "./api/Store" =====*/],
   function(declare, _ContractsMixin,
            QueryResults, SimpleQueryEngine,
-           Observable, lang) {
+           lang) {
 
     var ERROR_ALREADY_IN_STORE = new Error("Object already exists in this store");
 
-    var OurStore = declare([_ContractsMixin], {
+    var StoreOfStateful = declare([_ContractsMixin], {
       // summary:
       //		An in-memory Observable object store like dojo/store/Memory wrapped in dojo/store/Observable,
       //    but with the following differences:
@@ -33,6 +33,9 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       //
       //    Before you throw away the store, you must call removeAll, so that
       //    we can clean up listeners. Otherwise, you will have a memory leak.
+      //
+      //    The result is intended to be wrapped in dojo/store/Observable. We cannot do that
+      //    for you: the inheritance chain would be broken.
       //
       //    Based on dojo/store/Memory
 
@@ -66,11 +69,15 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
             var newId = thisStore.getIdentity(wrapper.data);
             if (oldId != newId) {
               wrapper.id = newId;
-              thisStore.notify(null, oldId);
-              thisStore.notify(wrapper.data, null);
+              if (thisStore.notify) {
+                thisStore.notify(null, oldId);
+                thisStore.notify(wrapper.data, null);
+              }
             }
             else {
-              thisStore.notify(wrapper.data, oldId);
+              if (thisStore.notify) {
+                thisStore.notify(wrapper.data, oldId);
+              }
             }
           };
           wrapper.watcher = wrapper.data.watch(watcher);
@@ -113,7 +120,8 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
 
       isOperational: function() {
         return this.getIdentity && lang.isFunction(this.getIdentity) &&
-          this.queryEngine && lang.isFunction(this.queryEngine);
+          this.queryEngine && lang.isFunction(this.queryEngine) &&
+          this.notify && lang.isFunction(this.notify);
       },
 
       contains: function(object){
@@ -160,6 +168,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       put: function(object) {
         // summary:
         //		Stores an object. Options are ignored.
+        //    Observable wrapper will send events.
         // object: Object
         //		The object to store.
         // returns: Number
@@ -178,7 +187,8 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       add: function(object){
         // summary:
         //		Creates an object, throws an error if the object already exists
-        //		Options are ignored.
+        //		Options are ignored..
+        //    Observable wrapper will send events.
         // object: Object
         //		The object to store.
         // returns: Number
@@ -194,6 +204,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       remove: function(id){
         // summary:
         //		Deletes an object by its identity
+        //    Observable wrapper will send events.
         // id: Number
         //		The identity to use to delete the object
         // returns: Boolean
@@ -274,7 +285,9 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
             if (indexInData < 0) {
               // not in inData; don't add to acc, signal removal
               wrapper.watcher.unwatch();
-              thisStore.notify(null, wrapper.id);
+              if (thisStore.notify) {
+                thisStore.notify(null, wrapper.id);
+              }
             }
             else {
               // keep the element (add to acc), and note handled.
@@ -298,7 +311,9 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         thisStore._data = [];
         oldData.forEach(function(wrapper) {
           wrapper.watcher.unwatch();
-          thisStore.notify(null, wrapper.id);
+          if (thisStore.notify) {
+            thisStore.notify(null, wrapper.id);
+          }
         });
       },
 
@@ -308,10 +323,10 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
 
     });
 
-    var OurObservableStore = function(options) {
-      return Observable(new OurStore(options));
-    };
+//    var OurObservableStore = function(options) {
+//      return Observable(new OurStore(options));
+//    };
 
-    return OurObservableStore;
+    return StoreOfStateful;
 
   });
