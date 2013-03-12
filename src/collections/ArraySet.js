@@ -111,7 +111,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           var thisSet = this;
           var callbackContext =  thisArg ? thisArg : thisSet;
           var result = iterator.call(
-            this._data,
+            this._data.slice(0),
             function(element, index, data) {
               callback.call(callbackContext, element, index, thisSet);
             }
@@ -124,7 +124,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           // TODO pre callback is a function
 
           // callback is invoked with three arguments: the element value, the element index, the set being traversed
-          this._iterate(this._data.forEach);
+          this._iterate(this._data.forEach, callback, thisArg);
           return this;
         },
 
@@ -133,7 +133,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           // TODO pre callback is a function
 
           // callback is invoked with three arguments: the element value, the element index, the set being traversed
-          return this._iterate(this._data.every);
+          return this._iterate(this._data.every, callback, thisArg);
         },
 
         some: function(/*Function*/ callback, /*Object*/ thisArg) {
@@ -141,7 +141,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           // TODO pre callback is a function
 
           // callback is invoked with three arguments: the element value, the element index, the set being traversed
-          return this._iterate(this._data.some);
+          return this._iterate(this._data.some, callback, thisArg);
         },
 
         filter: function(/*Function*/ callback, /*Object*/ thisArg) {
@@ -149,7 +149,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           // TODO pre callback is a function
 
           // callback is invoked with three arguments: the element value, the element index, the set being traversed
-          return this._iterate(this._data.filter);
+          return this._iterate(this._data.filter, callback, thisArg);
         },
 
         map: function(/*Function*/ callback, /*Object*/ thisArg) {
@@ -157,7 +157,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           // TODO pre callback is a function
 
           // callback is invoked with three arguments: the element value, the element index, the set being traversed
-          return this._iterate(this._data.map);
+          return this._iterate(this._data.map, callback, thisArg);
         },
 
         reduce: function(/*Function*/ callback, /*Object*/ initialValue) {
