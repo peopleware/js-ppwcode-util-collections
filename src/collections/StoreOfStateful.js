@@ -20,6 +20,8 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       //    3) removeAll, loadAll
       //    4) You need to inject a getIdentity function. It must work on all objects
       //       that ever were in the store or will be in the store, independent of the store.
+      //    5) If the data provided at construction has an `observe` method (i.e., it is
+      //       a QueryResult from an Observable), we watch that changing too.
       // description:
       //    On development we immediately need constructor, put, removeAll, loadAll, and query.
       //    getIdentity is needed for Observable.
@@ -103,17 +105,31 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
           Object.keys(options).
             filter(function(key) {return key !== "data";}).
             forEach(function(key) {thisStore[key] = options[key];});
-          if (options.data) {
-            thisStore._data = options.data.reduce(
-              function(acc, element) {
-                acc.push(thisStore._wrap(element));
-                return acc;
+        }
+        if (options && options.data) {
+          thisStore._data = options.data.reduce(
+            function(acc, element) {
+              acc.push(thisStore._wrap(element));
+              return acc;
+            },
+            []
+          );
+          if (options.data.observe) {
+            options.data.observe(
+              function(element, removedFrom, insertedInto) {
+                if (insertedInto === -1) { // removed
+                  thisStore.remove(this.getIdentity(element));
+                }
+                else if (removedFrom === -1) { // added
+                  thisStore.add(element);
+                }
+                // else, the notification is for a change;
+                //   but, first of all, we would not get that (false below)
+                //   and second, we are already listening to the object directly,
+                //   and send events from there
               },
-              []
+              false
             );
-          }
-          else {
-            hisStore._data = [];
           }
         }
         else {
