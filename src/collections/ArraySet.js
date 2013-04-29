@@ -99,10 +99,21 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         },
 
         contains: function(/*Object*/ any) {
-          var thisSet = this;
-          return this._data.some(function(element) {
-            return thisSet._equivalence(element, any);
-          });
+          return this._data.some(
+            function(element) {
+              return this._equivalence(element, any);
+            },
+            this
+          );
+        },
+
+        containsAll: function(/*Collection*/ c) {
+          return c.every(
+            function(el) {
+              return this.contains(el);
+            },
+            this
+          );
         },
 
         _iterate: function(/*Function*/ iterator, /*Function*/ callback, /*Object*/ thisArg) {
@@ -117,7 +128,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
           var result = iterator.call(
             this._data.slice(0),
             function(element, index, data) {
-              callback.call(callbackContext, element, index, thisSet);
+              return callback.call(callbackContext, element, index, thisSet);
             }
           );
           return result;
