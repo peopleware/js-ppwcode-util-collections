@@ -14,8 +14,10 @@
  limitations under the License.
  */
 
-define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
-    function(declare, _ContractMixin) {
+define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
+        "ppwcode/oddsAndEnds/js"],
+    function(declare, _ContractMixin,
+             js) {
 
       /* TODO This is a first version. There are more performant implementations of sets.
               We "assume" an "interface" here for Sets (see java.util.collections), which
@@ -66,7 +68,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           return new ArraySet({
             elementType: this._elementType,
             equivalence: this._equivalence,
-            data: this._data
+            data: this._data // MUDO DEEP CLONE!
           })
         },
 
@@ -77,9 +79,11 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
         isOfElementType: function(/*Object*/ element) {
           this._c_pre(function() {return element;});
 
-//          return element instanceof this._elementType;
-// // TODO not general enough; fails with Number, e.g.; requires inheritance, also dojo isInstanceOf
-          return true;
+          return js.typeOf(this.getElementType()) === "string" ?
+            js.typeOf(element) === this.getElementType() :
+            (element.isInstanceof ?
+              element.isInstanceOf(this.getElementType()) :
+              element instanceof this.getElementType());
         },
 
         getEquivalence: function() {
@@ -149,7 +153,11 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           // TODO pre callback is a function
 
           // callback is invoked with three arguments: the element value, the element index, the set being traversed
-          return this._iterate(this._data.filter, callback, thisArg);
+          return new ArraySet({
+            elementType: this._elementType,
+            equivalence: this._equivalence,
+            data: this._iterate(this._data.filter, callback, thisArg)
+          });
         },
 
         map: function(/*Function*/ callback, /*Object*/ thisArg) {
@@ -157,7 +165,11 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           // TODO pre callback is a function
 
           // callback is invoked with three arguments: the element value, the element index, the set being traversed
-          return this._iterate(this._data.map, callback, thisArg);
+          return new ArraySet({
+            elementType: this._elementType,
+            equivalence: this._equivalence,
+            data: this._iterate(this._data.map, callback, thisArg)
+          });
         },
 
         reduce: function(/*Function*/ callback, /*Object*/ initialValue) {
@@ -197,9 +209,15 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin"],
           }
         },
 
-//        addAll: function(/*Collection*/ collection) {
-//        },
-//
+        addAll: function(/*Collection*/ collection) {
+          collection.forEach(
+            function(cEl) {
+              this.add(cEl);
+            },
+            this
+          );
+        },
+
 //        addAll: function(/*Collection*/ collection, /*Function*/ filter) {
 //        },
 
