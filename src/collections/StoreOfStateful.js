@@ -118,7 +118,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
             options.data.observe(
               function(element, removedFrom, insertedInto) {
                 if (insertedInto === -1) { // removed
-                  thisStore.remove(this.getIdentity(element));
+                  thisStore.remove(thisStore.getIdentity(element));
                 }
                 else if (removedFrom === -1) { // added
                   thisStore.add(element);
