@@ -187,20 +187,23 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       put: function(object) {
         // summary:
         //		Stores an object. Options are ignored.
-        //    Observable wrapper will send events.
+        //    Observable wrapper will send events, replacing the object with the same identity.
         // object: Object
         //		The object to store.
         // returns: Number
         this._c_pre(function() {return this.isOperational();});
 
-        try {
-          this.add(object);
+        var id = this.getIdentity(object);
+        var existing = this.get(id);
+        if (existing && existing !== object) {
+          // we have an object with this identity already, and it is not the same object; remove the old object
+          this.remove(id);
         }
-        catch (e) {
-          if (e !== ERROR_ALREADY_IN_STORE) {
-            throw e;
-          }
+        if (!existing || existing !== object) {
+          // we did not have an object, or we just removed it; add the new object
+          this.add(object); // exception not possible (!existing or removed)
         }
+        // else, do nothing; object with id did exist, and was the same; events are sent already via watch
       },
 
       add: function(object){
