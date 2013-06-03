@@ -296,11 +296,13 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
       loadAll: function(data) {
         // summary:
         //   replaces current data with new data; common objects
-        //   are not signalled as removed and added again
+        //   are not signalled as removed and added again;
+        //   returns array of remove elements
         this._c_pre(function() {return this.isOperational();});
 
         var thisStore = this;
         var inData = data.slice(0);
+        var removed = [];
         thisStore._data = thisStore._data.reduce(
           function (acc, wrapper) {
             var indexInData = inData.indexOf(wrapper.data);
@@ -310,6 +312,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
               if (thisStore.notify) {
                 thisStore.notify(null, wrapper.id);
               }
+              removed.push(wrapper.data);
             }
             else {
               // keep the element (add to acc), and note handled.
@@ -324,6 +327,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         inData.forEach(function(newElement) {
           thisStore.put(newElement);
         });
+        return removed;
       },
 
       removeAll: function() {
