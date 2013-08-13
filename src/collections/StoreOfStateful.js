@@ -1,9 +1,9 @@
 define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         "dojo/store/util/QueryResults", "dojo/store/util/SimpleQueryEngine",
-        "dojo/_base/lang" /*=====, "./api/Store" =====*/],
+        "dojo/_base/lang", "ppwcode/oddsAndEnds/log/logger!" /*=====, "./api/Store" =====*/],
   function(declare, _ContractsMixin,
            QueryResults, SimpleQueryEngine,
-           lang) {
+           lang, logger) {
 
     var ERROR_ALREADY_IN_STORE = new Error("Object already exists in this store");
 
@@ -67,9 +67,12 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
             // on change, see if the id has changed
             // if it has, signal removal, and a new addition
             // if is has not, signal change
+
+            logger.trace("store: " + thisStore + " - got event from changed element: ('" + name + "', " + oldValue + ", " + newValue + ")");
             var oldId = wrapper.id;
             var newId = thisStore.getIdentity(wrapper.data);
             if (oldId != newId) {
+              logger.trace("id changed; updating id; store will notify removal and addition");
               wrapper.id = newId;
               if (thisStore.notify) {
                 thisStore.notify(null, oldId);
@@ -77,6 +80,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
               }
             }
             else {
+              logger.trace("id did not change; store will notify of change in element");
               if (thisStore.notify) {
                 thisStore.notify(wrapper.data, oldId);
               }
