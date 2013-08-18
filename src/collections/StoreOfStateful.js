@@ -86,6 +86,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
               }
             }
           };
+          //noinspection JSCheckFunctionSignatures
           wrapper.watcher = wrapper.data.watch(watcher);
         }
 
@@ -244,7 +245,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
                 throw "ERROR: duplicate id in store (id: " + id + ", store: " + thisStore + ")";
               }
               else {
-                wrapper.watcher.unwatch();
+                wrapper.watcher.remove();
                 return index;
               }
             }
@@ -301,7 +302,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         // summary:
         //   replaces current data with new data; common objects
         //   are not signalled as removed and added again;
-        //   returns array of remove elements
+        //   returns array of removed elements
         this._c_pre(function() {return this.isOperational();});
 
         var thisStore = this;
@@ -312,7 +313,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
             var indexInData = inData.indexOf(wrapper.data);
             if (indexInData < 0) {
               // not in inData; don't add to acc, signal removal
-              wrapper.watcher.unwatch();
+              wrapper.watcher.remove();
               if (thisStore.notify) {
                 thisStore.notify(null, wrapper.id);
               }
@@ -340,7 +341,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
         var oldData = thisStore._data;
         thisStore._data = [];
         oldData.forEach(function(wrapper) {
-          wrapper.watcher.unwatch();
+          wrapper.watcher.remove();
           if (thisStore.notify) {
             thisStore.notify(null, wrapper.id);
           }
