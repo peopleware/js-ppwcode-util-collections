@@ -7,6 +7,24 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
 
     var ERROR_ALREADY_IN_STORE = new Error("Object already exists in this store");
 
+    var DataWrapper = declare([], {
+
+      id: null,
+
+      // data: Stateful
+      data: null,
+
+      constructor: function(id, /*Stateful*/ data) {
+        this.id = id;
+        this.data = data;
+      },
+
+      toString: function() {
+        return this.data.toString();
+      }
+
+    });
+
     var StoreOfStateful = declare([_ContractsMixin], {
       // summary:
       //		An in-memory Observable object store like dojo/store/Memory wrapped in dojo/store/Observable,
@@ -90,10 +108,7 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
           wrapper.watcher = wrapper.data.watch(watcher);
         }
 
-        var result = {
-          id: thisStore.getIdentity(s),
-          data: s
-        };
+        var result = new DataWrapper(thisStore.getIdentity(s), s);
         addWatcher(result);
         return result;
       },
@@ -350,6 +365,10 @@ define(["dojo/_base/declare", "ppwcode/contracts/_Mixin",
 
       getLength: function() {
         return this._data.length;
+      },
+
+      toString: function() {
+        return "[" + this._data.length + "[" + this._data + "]]";
       }
 
     });
