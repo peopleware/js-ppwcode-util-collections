@@ -1,6 +1,6 @@
-define(["dojo/main", "ppwcode/contracts/doh",
+define(["ppwcode.contracts/doh",
         "../StoreOfStateful", "dojo/store/Observable"],
-  function(dojo, doh,
+  function(doh,
            StoreOfStateful, Observable) {
 
     doh.register("StoreOfStateful", [

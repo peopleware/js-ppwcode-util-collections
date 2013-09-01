@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-define(["dojo/main", "ppwcode/contracts/doh", "../ArraySet"],
-  function(dojo, doh, ArraySet) {
+define(["ppwcode.contracts/doh", "../ArraySet"],
+  function(doh, ArraySet) {
 
     doh.register("ppwcode util collections ArraySet", [
 
