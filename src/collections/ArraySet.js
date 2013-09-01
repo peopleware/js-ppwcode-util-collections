@@ -14,8 +14,8 @@
  limitations under the License.
  */
 
-define(["dojo/_base/declare", "ppwcode.util.contracts/_Mixin",
-        "ppwcode.util.oddsAndEnds/js"],
+define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
+        "ppwcode-util-oddsAndEnds/js"],
     function(declare, _ContractMixin,
              js) {
 
