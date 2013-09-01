@@ -1,6 +1,6 @@
-define(["dojo/_base/declare", "ppwcode.contracts/_Mixin",
+define(["dojo/_base/declare", "ppwcode.util.contracts/_Mixin",
         "dojo/store/util/QueryResults", "dojo/store/util/SimpleQueryEngine",
-        "dojo/_base/lang", "ppwcode.oddsAndEnds/log/logger!" /*=====, "./api/Store" =====*/],
+        "dojo/_base/lang", "ppwcode.util.oddsAndEnds/log/logger!" /*=====, "./api/Store" =====*/],
   function(declare, _ContractsMixin,
            QueryResults, SimpleQueryEngine,
            lang, logger) {

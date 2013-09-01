@@ -1,4 +1,4 @@
-define(["ppwcode.contracts/doh",
+define(["ppwcode.util.contracts/doh",
         "../StoreOfStateful", "dojo/store/Observable"],
   function(doh,
            StoreOfStateful, Observable) {
