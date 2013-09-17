@@ -1,0 +1,35 @@
+{
+  "name": "be.ppwcode-util-collections",
+  "version": "0.1.0",
+  "description": "Collections",
+  "keywords": [
+    "collections",
+    "ppwcode",
+    "PeopleWare"
+  ],
+  "maintainers": [
+    {
+      "name": "Jan Dockx",
+      "email": "Jan_Dockx@peopleware.be"
+    }
+  ],
+  "contributors": [],
+  "bugs": {
+    "mail": "Jan_Dockx@peopleware.be"
+  },
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "svn",
+      "url": "https://ppwcode.googlecode.com/svn/javascript/"
+    }
+  ],
+  "dependencies": [
+  ],
+  "dojoBuild": "collections.profile.js"
+}
