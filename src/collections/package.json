@@ -1,11 +1,14 @@
 {
   "name": "be.ppwcode-util-collections",
-  "version": "0.1.0",
-  "description": "Collections",
+  "version": "I 0.0",
+  "description": "A library of collection implementations",
   "keywords": [
-    "collections",
+    "PeopleWare",
     "ppwcode",
-    "PeopleWare"
+    "util",
+    "collections",
+    "ArraySet",
+    "StoreOfStateful"
   ],
   "maintainers": [
     {
@@ -13,7 +16,20 @@
       "email": "Jan_Dockx@peopleware.be"
     }
   ],
-  "contributors": [],
+  "contributors": [
+    {
+      "name": "Jan Dockx",
+      "email": "Jan_Dockx@peopleware.be"
+    },
+    {
+      "name": "Tom Crommen",
+      "email": "Tom_Crommen@peopleware.be"
+    },
+    {
+      "name": "Mark Cuypers",
+      "email": "Mark_Cuypers@peopleware.be"
+    }
+  ],
   "bugs": {
     "mail": "Jan_Dockx@peopleware.be"
   },
@@ -26,10 +42,13 @@
   "repositories": [
     {
       "type": "svn",
-      "url": "https://ppwcode.googlecode.com/svn/javascript/"
+      "url": "https://ppwcode.googlecode.com/svn/javascript/util/collections/"
     }
   ],
   "dependencies": [
   ],
+  "os": ["linux", "macos", "win"],
+  "cpu": ["x86", "ppc", "x86_64"],
+  "engines": ["v8", "ejs", "node", "rhino"],
   "dojoBuild": "collections.profile.js"
 }
