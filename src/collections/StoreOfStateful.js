@@ -159,8 +159,8 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
 
       isOperational: function() {
         return this.getIdentity && lang.isFunction(this.getIdentity) &&
-          this.queryEngine && lang.isFunction(this.queryEngine) &&
-          this.notify && lang.isFunction(this.notify);
+          this.queryEngine && lang.isFunction(this.queryEngine);// &&
+          //this.notify && lang.isFunction(this.notify);
       },
 
       contains: function(object){
@@ -308,9 +308,13 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         //	|	var results = store.query({ even: true });
         this._c_pre(function() {return this.isOperational();});
 
-        return QueryResults(this.queryEngine(query, options)(this._data.map(function(wrapper) {
+        return QueryResults(this.queryEngine(query, options)(this.getCurrentData()));
+      },
+
+      getCurrentData: function() {
+        return this._data.map(function(wrapper) {
           return wrapper.data;
-        })));
+        });
       },
 
       loadAll: function(data) {
