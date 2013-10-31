@@ -91,6 +91,8 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
             var newId = thisStore.getIdentity(wrapper.data);
             if (oldId != newId) {
               logger.trace("id changed; updating id; store will notify removal and addition");
+              logger.error("IDENTITY OF An OBJECT IN A STOREOFSTATEFUL CHANGED. This gets Observable of its rockers. It should not happen.");
+              // TODO replace this branch with an exception if it truly never occurs
               wrapper.id = newId;
               if (thisStore.notify) {
                 thisStore.notify(null, oldId);
