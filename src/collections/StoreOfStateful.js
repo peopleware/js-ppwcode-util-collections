@@ -98,6 +98,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
 
       _wrap: function(/*Stateful*/ s) {
         this._c_pre(function() {return this.isOperational();});
+        this._c_pre(function() {return typeof this.getIdentity(s) === "string"});
 
         var thisStore = this;
 
