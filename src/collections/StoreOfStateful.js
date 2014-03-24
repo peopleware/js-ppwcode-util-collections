@@ -117,7 +117,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
             var newId = thisStore.getIdentity(wrapper.data);
             if (oldId != newId) {
               logger.trace("id changed; updating id; store will notify removal and addition");
-              logger.error("IDENTITY OF AN OBJECT IN A STOREOFSTATEFUL CHANGED. This gets Observable of its rockers. It should not happen. (" +
+              logger.error("IDENTITY OF AN OBJECT IN A STORE_OF_STATEFUL CHANGED. This gets Observable of its rockers. It should not happen. (" +
                 "propertyName: " + name + ", oldValue: " + oldValue + ", newValue: " + newValue + ", oldId: " + oldId + ", newId: " + newId + ", data: " +
                 wrapper.data + ")");
               // TODO replace this branch with an exception if it truly never occurs
@@ -312,7 +312,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         // query: Object
         //		The query to use for retrieving objects from the store.
         // options: dojo/store/api/Store.QueryOptions?
-        //		The optional arguments to apply to the resultset.
+        //		The optional arguments to apply to the resultSet.
         // returns: dojo/store/api/Store.QueryResults
         //		The results of the query, extended with iterative methods.
         //

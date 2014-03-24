@@ -50,7 +50,9 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         _c_invar: [
           function() {return this.getElementType();},// TODO and is a Constructor
           function() {return this.getEquivalence();}, // TODO and is a function, as expected
-          function() {return this.getSize() != null && this.getSize() >= 0;} // TODO and is a Positive
+          function() {return this.getSize() !== null && this.getSize() !== null;},
+          function() {return typeof this.getSize() === "number";},
+          function() {return this.getSize() >= 0;}
         ],
 
         constructor: function(/*props*/ props) {
@@ -127,7 +129,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
           var callbackContext =  thisArg ? thisArg : thisSet;
           var result = iterator.call(
             this._data.slice(0),
-            function(element, index, data) {
+            function(element, index) {
               return callback.call(callbackContext, element, index, thisSet);
             }
           );
@@ -197,7 +199,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
 
           var thisSet = this;
           var result = this._data.reduce(
-            function(previousValue, currentValue, index, data) {
+            function(previousValue, currentValue, index) {
               callback.call(thisSet, previousValue, currentValue, index, thisSet);
             },
             initialValue
