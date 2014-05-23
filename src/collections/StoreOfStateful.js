@@ -91,8 +91,14 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
       //		Defines the query engine to use for querying the data store
       queryEngine: SimpleQueryEngine,
 
+      // noChangeProperties: String[]
+      //    Array of property names whose values are not considered a real "change" the StoreOfStateful should
+      //    propagate to observers.
+      noChangeProperties: [],
+
       _wrap: function(/*Stateful*/ s) {
         this._c_pre(function() {return this.isOperational();});
+        this._c_pre(function() {return typeof this.getIdentity(s) === "string"});
 
         var thisStore = this;
 
@@ -102,12 +108,18 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
             // if it has, signal removal, and a new addition
             // if is has not, signal change
 
+            if (thisStore.noChangeProperties && thisStore.noChangeProperties.indexOf(name) >= 0) {
+              // we don't consider a change in noChangeProperties as a true semantic change; NOP
+              return;
+            }
             logger.trace("store: " + thisStore + " - got event from changed element: ('" + name + "', " + oldValue + ", " + newValue + ")");
             var oldId = wrapper.id;
             var newId = thisStore.getIdentity(wrapper.data);
             if (oldId != newId) {
               logger.trace("id changed; updating id; store will notify removal and addition");
-              logger.error("IDENTITY OF An OBJECT IN A STOREOFSTATEFUL CHANGED. This gets Observable of its rockers. It should not happen.");
+              logger.error("IDENTITY OF AN OBJECT IN A STORE_OF_STATEFUL CHANGED. This gets Observable of its rockers. It should not happen. (" +
+                "propertyName: " + name + ", oldValue: " + oldValue + ", newValue: " + newValue + ", oldId: " + oldId + ", newId: " + newId + ", data: " +
+                wrapper.data + ")");
               // TODO replace this branch with an exception if it truly never occurs
               wrapper.id = newId;
               if (thisStore.notify) {
@@ -300,7 +312,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         // query: Object
         //		The query to use for retrieving objects from the store.
         // options: dojo/store/api/Store.QueryOptions?
-        //		The optional arguments to apply to the resultset.
+        //		The optional arguments to apply to the resultSet.
         // returns: dojo/store/api/Store.QueryResults
         //		The results of the query, extended with iterative methods.
         //

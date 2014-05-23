@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 var profile = (function () {
+
   function isTest(filename, mid) {
     return filename.indexOf("test/") >= 0;
   }
@@ -42,4 +43,5 @@ var profile = (function () {
       }
     }
   };
+
 })();
