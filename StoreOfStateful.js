@@ -75,8 +75,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
       //
       //    Based on dojo/store/Memory
 
-      _c_invar: [
-      ],
+      _c_invar: [],
 
       // _data: Array
       //   The internal representation of the data
@@ -112,14 +111,16 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
               // we don't consider a change in noChangeProperties as a true semantic change; NOP
               return;
             }
-            logger.trace("store: " + thisStore + " - got event from changed element: ('" + name + "', " + oldValue + ", " + newValue + ")");
+            logger.trace("store: " + thisStore + " - got event from changed element: ('" +
+                         name + "', " + oldValue + ", " + newValue + ")");
             var oldId = wrapper.id;
             var newId = thisStore.getIdentity(wrapper.data);
             if (oldId != newId) {
               logger.trace("id changed; updating id; store will notify removal and addition");
-              logger.error("IDENTITY OF AN OBJECT IN A STORE_OF_STATEFUL CHANGED. This gets Observable of its rockers. It should not happen. (" +
-                "propertyName: " + name + ", oldValue: " + oldValue + ", newValue: " + newValue + ", oldId: " + oldId + ", newId: " + newId + ", data: " +
-                wrapper.data + ")");
+              logger.error("IDENTITY OF AN OBJECT IN A STORE_OF_STATEFUL CHANGED. This gets Observable of its rockers. " +
+                           "It should not happen. (" +
+                           "propertyName: " + name + ", oldValue: " + oldValue + ", newValue: " + newValue +
+                           ", oldId: " + oldId + ", newId: " + newId + ", data: " + wrapper.data + ")");
               // TODO replace this branch with an exception if it truly never occurs
               wrapper.id = newId;
               if (thisStore.notify) {
@@ -189,11 +190,11 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
 
       isOperational: function() {
         return this.getIdentity && lang.isFunction(this.getIdentity) &&
-          this.queryEngine && lang.isFunction(this.queryEngine);// &&
-          //this.notify && lang.isFunction(this.notify);
+               this.queryEngine && lang.isFunction(this.queryEngine);
+        // && this.notify && lang.isFunction(this.notify);
       },
 
-      contains: function(object){
+      contains: function(object) {
         // summary:
         //		Is the object in this store?
         // object: Object
@@ -212,7 +213,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         }
       },
 
-      get: function(id){
+      get: function(id) {
         // summary:
         //		Retrieves an object by its identity
         // id: Number
@@ -256,7 +257,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         // else, do nothing; object with id did exist, and was the same; events are sent already via watch
       },
 
-      add: function(object){
+      add: function(object) {
         // summary:
         //		Creates an object, throws an error if the object already exists
         //		Options are ignored..
@@ -273,7 +274,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         this._data.push(wrapper); // Store spec doesn't say what we should return. We return nothing.
       },
 
-      remove: function(id){
+      remove: function(id) {
         // summary:
         //		Deletes an object by its identity
         //    Observable wrapper will send events.
@@ -306,7 +307,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         // Store spec doesn't say what we should return. We return nothing.
       },
 
-      query: function(query, options){
+      query: function(query, options) {
         // summary:
         //		Queries the store for objects.
         // query: Object
@@ -358,7 +359,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         var inData = data.slice(0);
         var removed = [];
         thisStore._data = thisStore._data.reduce(
-          function (acc, wrapper) {
+          function(acc, wrapper) {
             var indexInData = inData.indexOf(wrapper.data);
             if (indexInData < 0) {
               // not in inData; don't add to acc, signal removal
@@ -407,9 +408,9 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
 
     });
 
-//    var OurObservableStore = function(options) {
-//      return Observable(new OurStore(options));
-//    };
+    //    var OurObservableStore = function(options) {
+    //      return Observable(new OurStore(options));
+    //    };
 
     return StoreOfStateful;
 
