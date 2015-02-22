@@ -21,6 +21,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
            QueryResults, SimpleQueryEngine,
            lang, logger) {
 
+    //noinspection LocalVariableNamingConventionJS
     var ERROR_ALREADY_IN_STORE = new Error("Object already exists in this store");
 
     var DataWrapper = declare([], {
@@ -97,7 +98,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
 
       _wrap: function(/*Stateful*/ s) {
         this._c_pre(function() {return this.isOperational();});
-        this._c_pre(function() {return typeof this.getIdentity(s) === "string"});
+        this._c_pre(function() {return typeof this.getIdentity(s) === "string";});
 
         var thisStore = this;
 

@@ -208,7 +208,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
       },
 
       toArray: function() {
-        return this._data.slice();
+        return this._data.slice(0);
       },
 
       add: function(/*Object*/ element) {
