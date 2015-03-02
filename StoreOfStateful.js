@@ -112,17 +112,21 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
               // we don't consider a change in noChangeProperties as a true semantic change; NOP
               return;
             }
-            logger.trace("store: " + thisStore + " - got event from changed element: ('" +
-                         name + "', " + oldValue + ", " + newValue + ")");
+            if (logger.isTraceEnabled()) {
+              logger.trace("store: " + thisStore + " - got event from changed element: ('" +
+                           name + "', " + oldValue + ", " + newValue + ")");
+            }
             var oldId = wrapper.id;
             var newId = thisStore.getIdentity(wrapper.data);
             if (oldId !== newId) {
               logger.trace("id changed; updating id; store will notify removal and addition");
-              logger.error("IDENTITY OF AN OBJECT IN A STORE_OF_STATEFUL CHANGED. This gets Observable of its rockers. " +
-                           "It should not happen. (" +
-                           "propertyName: " + name + ", oldValue: " + oldValue + ", newValue: " + newValue +
-                           ", oldId: " + oldId + ", newId: " + newId + ", data: " + wrapper.data + ")");
-              // TODO replace this branch with an exception if it truly never occurs
+              if (logger.isErrorEnabled()) {
+                logger.error("IDENTITY OF AN OBJECT IN A STORE_OF_STATEFUL CHANGED. This gets Observable of its rockers. " +
+                             "It should not happen. (" +
+                             "propertyName: " + name + ", oldValue: " + oldValue + ", newValue: " + newValue +
+                             ", oldId: " + oldId + ", newId: " + newId + ", data: " + wrapper.data + ")");
+                // TODO replace this branch with an exception if it truly never occurs
+              }
               wrapper.id = newId;
               if (thisStore.notify) {
                 thisStore.notify(null, oldId);
