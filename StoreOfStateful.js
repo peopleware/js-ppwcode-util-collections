@@ -358,9 +358,11 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         //   replaces current data with new data; common objects
         //   are not signalled as removed and added again;
         //   returns array of removed elements
+        this._c_pre(function() {return data && data.slice;});
         this._c_pre(function() {return this.isOperational();});
 
         var thisStore = this;
+        logger.debug("loadAll - data.length = " + data.length);
         var inData = data.slice(0);
         var removed = [];
         thisStore._data = thisStore._data.reduce(
@@ -373,11 +375,13 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
                 thisStore.notify(null, wrapper.id);
               }
               removed.push(wrapper.data);
+              logger.debug("loadAll - removing " + wrapper.id);
             }
             else {
               // keep the element (add to acc), and note handled.
               inData.splice(indexInData, 1);
               acc.push(wrapper);
+              logger.debug("loadAll - keeping " + wrapper.id);
             }
             return acc;
           },
@@ -385,6 +389,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         );
         // what is left in inData needs to be added
         inData.forEach(function(newElement) {
+          logger.debug("loadAll - adding " + thisStore.getIdentity(newElement));
           thisStore.put(newElement);
         });
         return removed;
