@@ -100,7 +100,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         this._c_pre(function() {return this.isOperational();});
         this._c_pre(function() {return typeof this.getIdentity(s) === "string";});
 
-        var thisStore = this;
+        var self = this;
 
         function addWatcher(wrapper) {
           var watcher = function(name, oldValue, newValue) {
@@ -108,34 +108,34 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
             // if it has, signal removal, and a new addition
             // if is has not, signal change
 
-            if (thisStore.noChangeProperties && thisStore.noChangeProperties.indexOf(name) >= 0) {
+            if (self.noChangeProperties && self.noChangeProperties.indexOf(name) >= 0) {
               // we don't consider a change in noChangeProperties as a true semantic change; NOP
               return;
             }
             if (logger.isTraceEnabled()) {
-              logger.trace("store: " + thisStore + " - got event from changed element: ('" +
+              logger.trace("store: " + self + " - got event from changed element: ('" +
                            name + "', " + oldValue + ", " + newValue + ")");
             }
             var oldId = wrapper.id;
-            var newId = thisStore.getIdentity(wrapper.data);
+            var newId = self.getIdentity(wrapper.data);
             if (oldId !== newId) {
               if (newId) { // oldId is never null
                 logger.trace("id changed; updating id; store will notify removal and addition");
                 wrapper.id = newId;
-                if (thisStore.notify) {
-                  thisStore.notify(null, oldId);
-                  thisStore.notify(wrapper.data, null);
+                if (self.notify) {
+                  self.notify(null, oldId);
+                  self.notify(wrapper.data, null);
                 }
               }
               else {
                 logger.info("id changed to null; Stateful will be removed");
-                this.remove(oldId);
+                self.remove(oldId);
               }
             }
             else {
               logger.trace("id did not change; store will notify of change in element");
-              if (thisStore.notify) {
-                thisStore.notify(wrapper.data, oldId);
+              if (self.notify) {
+                self.notify(wrapper.data, oldId);
               }
             }
           };
@@ -143,7 +143,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
           wrapper.watcher = wrapper.data.watch(watcher);
         }
 
-        var result = new DataWrapper(thisStore.getIdentity(s), s);
+        var result = new DataWrapper(self.getIdentity(s), s);
         addWatcher(result);
         return result;
       },
