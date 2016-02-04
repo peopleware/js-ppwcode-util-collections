@@ -119,18 +119,17 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
             var oldId = wrapper.id;
             var newId = thisStore.getIdentity(wrapper.data);
             if (oldId !== newId) {
-              logger.trace("id changed; updating id; store will notify removal and addition");
-              if (logger.isErrorEnabled()) {
-                logger.error("IDENTITY OF AN OBJECT IN A STORE_OF_STATEFUL CHANGED. This gets Observable of its rockers. " +
-                             "It should not happen. (" +
-                             "propertyName: " + name + ", oldValue: " + oldValue + ", newValue: " + newValue +
-                             ", oldId: " + oldId + ", newId: " + newId + ", data: " + wrapper.data + ")");
-                // TODO replace this branch with an exception if it truly never occurs
+              if (newId) { // oldId is never null
+                logger.trace("id changed; updating id; store will notify removal and addition");
+                wrapper.id = newId;
+                if (thisStore.notify) {
+                  thisStore.notify(null, oldId);
+                  thisStore.notify(wrapper.data, null);
+                }
               }
-              wrapper.id = newId;
-              if (thisStore.notify) {
-                thisStore.notify(null, oldId);
-                thisStore.notify(wrapper.data, null);
+              else {
+                logger.info("id changed to null; Stateful will be removed");
+                this.remove(oldId);
               }
             }
             else {
