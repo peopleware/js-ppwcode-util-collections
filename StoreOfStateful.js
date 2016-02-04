@@ -119,17 +119,42 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
             var oldId = wrapper.id;
             var newId = self.getIdentity(wrapper.data);
             if (oldId !== newId) {
+              /* Observable will look for the removed object in its "query result" arrays to remove it there too,
+               and signal removal to listeners on the query results.
+               What it gets from us is the oldId. It iterates over its query results cache, asking us
+               getIdentity of every of its objects. If it finds a match on the id, the element will be removed from
+               its query results cache, and it will signal removal to the listeners.
+               For the removed object however, getIdentity will return the new id by know, which will not match
+               the oldId we signal as removed here. So Observable believes the removed element is not in its query
+               results cache, and will do nothing.
+
+               Signalling could be better if we tell Observable the object, not the identity. It could find the
+               object. It reports on index, not identity, so that would be ok.
+
+               We can fake this, by having getIdentity return the oldId for the object during the notify cycle.
+
+               For that, we must intercept the call to getIdentity for a moment.
+               */
+              var originalGetIdentity = self.getIdentity;
+              self.getIdentity = function(/*Stateful*/ s) {
+                if (s === wrapper.data) {
+                  return oldId;
+                }
+                return originalGetIdentity(s);
+              };
               if (newId) { // oldId is never null
                 logger.trace("id changed; updating id; store will notify removal and addition");
                 wrapper.id = newId;
                 if (self.notify) {
                   self.notify(null, oldId);
+                  self.getIdentity = originalGetIdentity;
                   self.notify(wrapper.data, null);
                 }
               }
               else {
                 logger.info("id changed to null; Stateful will be removed");
                 self.remove(oldId);
+                self.getIdentity = originalGetIdentity;
               }
             }
             else {
