@@ -69,7 +69,7 @@ define(["dojo/_base/declare", "ppwcode-util-contracts/_Mixin",
         return new ArraySet({
           elementType: this._elementType,
           equivalence: this._equivalence,
-          data: this._data // MUDO DEEP CLONE!
+          data: this._data // TODO DEEP CLONE!
         });
       },
 
